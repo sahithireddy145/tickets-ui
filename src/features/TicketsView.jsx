@@ -1,70 +1,49 @@
 import { useNavigate } from "react-router-dom";
-import CreateTicket from "./CreateTicket";
-
-const tickets = [
-  {
-    id: "f7680130-53b3-4411-b874-324238df8d8f",
-    title: "Login Issue",
-    description: "User unable to log in after resetting password.",
-    status: "open",
-    priority: "high",
-    assignee: "john.doe@example.com",
-    reporter: "alice@example.com",
-    category: "bug",
-    created_at: "2025-09-30T17:19:17.546759",
-    updated_at: "2025-09-30T17:19:17.546759",
-  },
-  {
-    id: "11a227fe-7ad9-4e7b-9e67-79f0aadf9425",
-    title: "Add Dark Mode",
-    description:
-      "Several users requested a dark mode feature for better usability at night.",
-    status: "in_progress",
-    priority: "medium",
-    assignee: "dev.team@example.com",
-    reporter: "pm@example.com",
-    category: "feature",
-    created_at: "2025-09-30T17:19:17.546759",
-    updated_at: "2025-09-30T17:19:17.546759",
-  },
-  {
-    id: "d6ff23d6-3b01-49b1-91dc-3bdd64ff0761",
-    title: "Billing Error",
-    description: "Incorrect total shown on invoice for multiple purchases.",
-    status: "open",
-    priority: "urgent",
-    assignee: "support.agent@example.com",
-    reporter: "customer@example.com",
-    category: "support",
-    created_at: "2025-09-30T17:19:17.546759",
-    updated_at: "2025-09-30T17:19:17.546759",
-  },
-];
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { fetchTickets } from "../services/api";
+import { setLoading } from "../store/ticketsSlice";
+import Spinner from "../ui/Spinner";
 
 function TicketsView() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { tickets, loading } = useSelector((state) => state.tickets);
+
+  useEffect(() => {
+    dispatch(setLoading(true));
+    dispatch(fetchTickets());
+  }, [dispatch]);
 
   return (
     <>
       <div>
         <h2>Tickets</h2>
-        <table border="1" cellPadding="10" cellSpacing="0">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Assignee</th>
-              <th>Reporter</th>
-              <th>Category</th>
-              <th>Created At</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tickets.length > 0 ? (
-              tickets.map((ticket) => (
-                <tr key={ticket.id}>
+
+        {loading ? (
+          <Spinner />
+        ) : tickets.length > 0 ? (
+          <table border="1" cellPadding="10" cellSpacing="0" width="100%">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Priority</th>
+                <th>Assignee</th>
+                <th>Reporter</th>
+                <th>Category</th>
+                <th>Created At</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((ticket) => (
+                <tr
+                  key={ticket.id}
+                  onDoubleClick={() => navigate(`/ticket?id=${ticket.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{ticket.id}</td>
                   <td>{ticket.title}</td>
                   <td>{ticket.status}</td>
@@ -73,26 +52,23 @@ function TicketsView() {
                   <td>{ticket.reporter}</td>
                   <td>{ticket.category}</td>
                   <td>{new Date(ticket.created_at).toLocaleString()}</td>
+                  <td>
+                    <button>Edit</button>
+                    <button>Delete</button>
+                  </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="8" align="center">
-                  No tickets found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p style={{ textAlign: "center", marginTop: "20px" }}>
+            No tickets found
+          </p>
+        )}
       </div>
-      <div>
-        <button
-          onClick={() => {
-            navigate("/create");
-          }}
-        >
-          Create Ticket
-        </button>
+
+      <div style={{ marginTop: "20px" }}>
+        <button onClick={() => navigate("/create")}>Create Ticket</button>
       </div>
     </>
   );
