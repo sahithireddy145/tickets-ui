@@ -35,6 +35,7 @@ function TicketsView() {
                 <th>Reporter</th>
                 <th>Category</th>
                 <th>Created At</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -42,7 +43,7 @@ function TicketsView() {
                 <tr
                   key={ticket.id}
                   onDoubleClick={() => navigate(`/ticket?id=${ticket.id}`)}
-                  style={{ cursor: "pointer" }}
+                  style={{ cursor: "default" }}
                 >
                   <td>{ticket.id}</td>
                   <td>{ticket.title}</td>
@@ -52,9 +53,10 @@ function TicketsView() {
                   <td>{ticket.reporter}</td>
                   <td>{ticket.category}</td>
                   <td>{new Date(ticket.created_at).toLocaleString()}</td>
-                  <td>
-                    <button>Edit</button>
-                    <button>Delete</button>
+
+                  <td onDoubleClick={(e) => e.stopPropagation()}>
+                    <button style={{ cursor: "pointer" }}>Edit</button>
+                    <button style={{ cursor: "pointer" }}>Delete</button>
                   </td>
                 </tr>
               ))}

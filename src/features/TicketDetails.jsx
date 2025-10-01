@@ -1,72 +1,68 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
-import { fetchTickets } from "../services/api";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { fetchTicketById } from "../services/api";
 import Spinner from "../ui/Spinner";
-import { setLoading } from "../store/ticketsSlice";
 import InvalidTicket from "./InvalidTicket";
+import { getTicketItem } from "../store/ticketsSlice";
 
 function TicketDetails() {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
 
+  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { tickets, loading } = useSelector((state) => state.tickets);
 
-  const [ticket, setTicket] = useState(null);
-
-  useEffect(() => {
-    if (tickets.length === 0) {
-      dispatch(setLoading(true));
-      dispatch(fetchTickets());
-    }
-  }, [tickets, dispatch]);
-
-  useEffect(
-    function () {
-      if (tickets.length > 0) {
-        const ticketfound = tickets.find(
-          (ticket) => String(ticket.id) === String(id)
-        );
-        setTicket(ticketfound);
-      }
-    },
-    [tickets, id]
+  const { currentTicket, currentTicketLoading } = useSelector(
+    (state) => state.tickets
   );
 
-  if (!ticket) return <InvalidTicket />;
+  useEffect(() => {
+    return function () {
+      dispatch(getTicketItem(null));
+    };
+  }, []);
 
-  if (loading) return <Spinner />;
+  useEffect(() => {
+    if (id) {
+      dispatch(fetchTicketById(id));
+    }
+  }, [dispatch, id]);
+
+  if (currentTicketLoading) return <Spinner />;
+
+  if (!currentTicket) return <InvalidTicket />;
 
   return (
-    <form style={{ padding: "20px" }}>
+    <div style={{ padding: "20px" }}>
       <h2>Ticket details</h2>
       <p>
-        <strong>ID:</strong> {ticket.id}
+        <strong>ID:</strong> {currentTicket.id}
       </p>
       <p>
-        <strong>Title:</strong> {ticket.title}
+        <strong>Title:</strong> {currentTicket.title}
       </p>
       <p>
-        <strong>Status:</strong> {ticket.status}
+        <strong>Status:</strong> {currentTicket.status}
       </p>
       <p>
-        <strong>Priority:</strong> {ticket.priority}
+        <strong>Priority:</strong> {currentTicket.priority}
       </p>
       <p>
-        <strong>Assignee:</strong> {ticket.assignee}
+        <strong>Assignee:</strong> {currentTicket.assignee}
       </p>
       <p>
-        <strong>Reporter:</strong> {ticket.reporter}
+        <strong>Reporter:</strong> {currentTicket.reporter}
       </p>
       <p>
-        <strong>Category:</strong> {ticket.category}
+        <strong>Category:</strong> {currentTicket.category}
       </p>
       <p>
         <strong>Created At:</strong>{" "}
-        {new Date(ticket.created_at).toLocaleString()}
+        {new Date(currentTicket.created_at).toLocaleString()}
       </p>
-    </form>
+      <button onClick={() => navigate("/")}>🔙Home</button>
+    </div>
   );
 }
 
