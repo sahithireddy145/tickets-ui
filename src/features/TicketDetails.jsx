@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router-dom";
 import { fetchTickets } from "../services/api";
 import Spinner from "../ui/Spinner";
 import { setLoading } from "../store/ticketsSlice";
+import InvalidTicket from "./InvalidTicket";
 
 function TicketDetails() {
   const [searchParams] = useSearchParams();
@@ -33,7 +34,7 @@ function TicketDetails() {
     [tickets, id]
   );
 
-  if (!ticket) return;
+  if (!ticket) return <InvalidTicket />;
 
   if (loading) return <Spinner />;
 
