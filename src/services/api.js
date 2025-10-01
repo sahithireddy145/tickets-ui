@@ -1,4 +1,9 @@
-import { setTickets } from "../store/ticketsSlice";
+import {
+  setTickets,
+  getTicketItem,
+  setLoading,
+  setCurrentTicketLoading,
+} from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
 
 export const API_URL =
@@ -20,13 +25,32 @@ export function fetchTickets() {
         headers: HEADERS,
       });
       const data = await res.json();
-      console.log(data);
 
       if (!data) return <Spinner />;
 
       dispatch(setTickets(data));
     } catch (err) {
       console.log(err);
+    }
+  };
+}
+
+export function fetchTicketById(id) {
+  return async function (dispatch) {
+    try {
+      dispatch(setCurrentTicketLoading(true));
+      const res = await fetch(`${API_URL}?id=eq.${id}`, {
+        headers: HEADERS,
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch");
+
+      const data = await res.json();
+      dispatch(getTicketItem(data[0]));
+      dispatch(setCurrentTicketLoading(false));
+    } catch (err) {
+      dispatch(setCurrentTicketLoading(false));
+      console.error("Error Fetching ticket: ", err.message);
     }
   };
 }
