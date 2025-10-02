@@ -5,17 +5,19 @@ const initialState = {
   loading: false,
   currentTicket: null,
   currentTicketLoading: true,
+  errorMessage: "",
+  isNewTicketLoading: false,
 };
 
 const ticketsSlice = createSlice({
   name: "ticketsData",
   initialState,
   reducers: {
-    setTickets: (state, action) => {
+    getTickets: (state, action) => {
       state.tickets = action.payload;
       state.loading = false; // data finished loading
     },
-    getTicketItem: (state, action) => {
+    setTicketItem: (state, action) => {
       state.currentTicket = action.payload;
     },
     addTicket: (state, action) => {
@@ -32,15 +34,23 @@ const ticketsSlice = createSlice({
     setCurrentTicketLoading: (state, action) => {
       state.currentTicketLoading = action.payload;
     },
+    setCreateTicketLoading: (state, action) => {
+      state.isNewTicketLoading = action.payload;
+    },
+    setErrorMessage: (state, action) => {
+      state.errorMessage = action.payload;
+    },
   },
 });
 
 export const {
-  setTickets,
+  getTickets,
   addTicket,
   removeTicket,
   setLoading,
-  getTicketItem,
+  setTicketItem,
   setCurrentTicketLoading,
+  setErrorMessage,
+  setCreateTicketLoading,
 } = ticketsSlice.actions;
 export default ticketsSlice.reducer;

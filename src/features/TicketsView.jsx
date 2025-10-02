@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { fetchTickets } from "../services/api";
 import { setLoading } from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
+import CreateTicketPopUp from "./CreateTicket";
 
 function TicketsView() {
   const navigate = useNavigate();
@@ -70,7 +71,7 @@ function TicketsView() {
       </div>
 
       <div style={{ marginTop: "20px" }}>
-        <button onClick={() => navigate("/create")}>Create Ticket</button>
+        <CreateTicketPopUp />
       </div>
     </>
   );

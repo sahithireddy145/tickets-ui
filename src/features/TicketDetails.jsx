@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { fetchTicketById } from "../services/api";
 import Spinner from "../ui/Spinner";
 import InvalidTicket from "./InvalidTicket";
-import { getTicketItem } from "../store/ticketsSlice";
+import { setTicketItem } from "../store/ticketsSlice";
 
 function TicketDetails() {
   const [searchParams] = useSearchParams();
@@ -19,7 +19,7 @@ function TicketDetails() {
 
   useEffect(() => {
     return function () {
-      dispatch(getTicketItem(null));
+      dispatch(setTicketItem(null));
     };
   }, []);
 
@@ -28,6 +28,8 @@ function TicketDetails() {
       dispatch(fetchTicketById(id));
     }
   }, [dispatch, id]);
+
+  if (!id) return <InvalidTicket />;
 
   if (currentTicketLoading) return <Spinner />;
 

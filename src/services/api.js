@@ -1,8 +1,11 @@
 import {
-  setTickets,
-  getTicketItem,
+  getTickets,
+  setTicketItem,
   setLoading,
   setCurrentTicketLoading,
+  addTicket,
+  setErrorMessage,
+  setCreateTicketLoading,
 } from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
 
@@ -16,6 +19,7 @@ const HEADERS = {
   apikey: API_KEY,
   Authorization: `Bearer ${API_KEY}`,
   "Content-Type": "application/json",
+  Prefer: "return=representation",
 };
 
 export function fetchTickets() {
@@ -28,7 +32,7 @@ export function fetchTickets() {
 
       if (!data) return <Spinner />;
 
-      dispatch(setTickets(data));
+      dispatch(getTickets(data));
     } catch (err) {
       console.log(err);
     }
@@ -46,11 +50,42 @@ export function fetchTicketById(id) {
       if (!res.ok) throw new Error("Failed to fetch");
 
       const data = await res.json();
-      dispatch(getTicketItem(data[0]));
+      dispatch(setTicketItem(data[0]));
       dispatch(setCurrentTicketLoading(false));
     } catch (err) {
       dispatch(setCurrentTicketLoading(false));
       console.error("Error Fetching ticket: ", err.message);
+    }
+  };
+}
+
+export function createNewTicket(newTicket) {
+  return async function (dispatch) {
+    try {
+      dispatch(setErrorMessage(null));
+      dispatch(setCreateTicketLoading(true));
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: HEADERS,
+        body: JSON.stringify(newTicket),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        dispatch(setErrorMessage(errorText));
+        return false;
+      }
+
+      const data = await res.json();
+      console.log("Ticket Created: ", data[0]);
+      dispatch(addTicket(data[0]));
+      dispatch(setErrorMessage(null));
+      dispatch(fetchTickets());
+
+      return true;
+    } catch (err) {
+      console.error("❌ Error creating ticket:", err.message);
+      dispatch(setErrorMessage(err.message));
     }
   };
 }
