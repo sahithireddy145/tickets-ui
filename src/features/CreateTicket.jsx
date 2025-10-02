@@ -17,7 +17,7 @@ import { useState } from "react";
 import { createNewTicket } from "../services/api";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../ui/Spinner";
-import { setCreateTicketLoading } from "../store/ticketsSlice";
+import { setCreateTicketLoading, setErrorMessage } from "../store/ticketsSlice";
 
 function CreateTicketPopUp() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +38,7 @@ function CreateTicketPopUp() {
   );
 
   function handleCreateTicket() {
+    dispatch(setErrorMessage(null));
     setIsOpen(true);
     dispatch(setCreateTicketLoading(false));
   }
