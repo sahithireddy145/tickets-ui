@@ -71,7 +71,9 @@ export function createNewTicket(newTicket) {
       });
 
       if (!res.ok) {
-        const errorText = await res.text();
+        const error = await res.text();
+        const errorText = JSON.parse(error).message;
+        // console.log("Coming from api: ", errorText.message);
         dispatch(setCreateTicketLoading(false));
         dispatch(setErrorMessage(errorText));
 

@@ -20,8 +20,7 @@ import Spinner from "../ui/Spinner";
 import { setCreateTicketLoading, setErrorMessage } from "../store/ticketsSlice";
 
 function CreateTicketPopUp() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const initialState = {
     title: "",
     description: "",
     status: "",
@@ -29,7 +28,9 @@ function CreateTicketPopUp() {
     assignee: "",
     reporter: "",
     category: "",
-  });
+  };
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState({});
 
   const dispatch = useDispatch();
@@ -37,7 +38,32 @@ function CreateTicketPopUp() {
     (state) => state.tickets
   );
 
+  // ✅ centralized validation rules
+  const rules = {
+    title: (value) => (!value ? "Title is required" : ""),
+    description: (value) => (!value ? "Description is required" : ""),
+    status: (value) => (!value ? "Status is required" : ""),
+    priority: (value) => (!value ? "Priority is required" : ""),
+    assignee: (value) => (!value ? "Assignee is required" : ""),
+    reporter: (value) => {
+      if (!value) return "Reporter is required";
+      if (!/\S+@\S+\.\S+/.test(value)) return "Reporter email is invalid";
+      return "";
+    },
+    category: (value) => (!value ? "Category is required" : ""),
+  };
+
+  // ✅ validate a single field
+  function validateField(name, value) {
+    const message = rules[name] ? rules[name](value) : "";
+    setErrors((prev) => ({
+      ...prev,
+      [name]: message || undefined,
+    }));
+  }
+
   function handleCreateTicket() {
+    setErrors({});
     dispatch(setErrorMessage(null));
     setIsOpen(true);
     dispatch(setCreateTicketLoading(false));
@@ -45,39 +71,28 @@ function CreateTicketPopUp() {
 
   function handleOnCancel() {
     setIsOpen(false);
-    setFormData({
-      title: "",
-      description: "",
-      status: "",
-      priority: "",
-      assignee: "",
-      reporter: "",
-      category: "",
-    });
+    setFormData(initialState);
   }
 
   function handleOnChange(e) {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    // ✅ live validation as user types
+    if (errors[name]) {
+      validateField(name, value);
+    }
   }
 
   function handleSubmit() {
     let tempErrors = {};
-
-    if (!formData.title) tempErrors.title = "Title is required";
-    if (!formData.description)
-      tempErrors.description = "Description is required";
-    if (!formData.status) tempErrors.status = "Status is required";
-    if (!formData.priority) tempErrors.priority = "Priority is required";
-    if (!formData.assignee) tempErrors.assignee = "Assignee is required";
-    if (!formData.reporter) {
-      tempErrors.reporter = "Reporter is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.reporter)) {
-      tempErrors.reporter = "Reporter email is invalid";
-    }
-    if (!formData.category) tempErrors.category = "Category is required";
+    Object.keys(rules).forEach((field) => {
+      const msg = rules[field](formData[field]);
+      if (msg) tempErrors[field] = msg;
+    });
 
     setErrors(tempErrors);
 
@@ -117,16 +132,19 @@ function CreateTicketPopUp() {
                     variant="outlined"
                     value={formData.title}
                     onChange={handleOnChange}
+                    onBlur={(e) => validateField("title", e.target.value)}
                     error={!!errors.title}
                     helperText={errors.title}
+                    required
                   />
 
                   <FormControl fullWidth margin="dense" error={!!errors.status}>
-                    <InputLabel>Status</InputLabel>
+                    <InputLabel required>Status</InputLabel>
                     <Select
                       name="status"
                       value={formData.status}
                       onChange={handleOnChange}
+                      onBlur={(e) => validateField("status", e.target.value)}
                       label="Status"
                     >
                       <MenuItem value="open">Open</MenuItem>
@@ -145,11 +163,12 @@ function CreateTicketPopUp() {
                     margin="dense"
                     error={!!errors.priority}
                   >
-                    <InputLabel>Priority</InputLabel>
+                    <InputLabel required>Priority</InputLabel>
                     <Select
                       name="priority"
                       value={formData.priority}
                       onChange={handleOnChange}
+                      onBlur={(e) => validateField("priority", e.target.value)}
                       label="Priority"
                     >
                       <MenuItem value="urgent">Urgent</MenuItem>
@@ -176,8 +195,10 @@ function CreateTicketPopUp() {
                     variant="outlined"
                     value={formData.description}
                     onChange={handleOnChange}
+                    onBlur={(e) => validateField("description", e.target.value)}
                     error={!!errors.description}
                     helperText={errors.description}
+                    required
                   />
 
                   <FormControl
@@ -185,11 +206,12 @@ function CreateTicketPopUp() {
                     margin="dense"
                     error={!!errors.assignee}
                   >
-                    <InputLabel>Assignee</InputLabel>
+                    <InputLabel required>Assignee</InputLabel>
                     <Select
                       name="assignee"
                       value={formData.assignee}
                       onChange={handleOnChange}
+                      onBlur={(e) => validateField("assignee", e.target.value)}
                       label="Assignee"
                     >
                       <MenuItem value="sai@tyujhgfji.com">Sai Prasad</MenuItem>
@@ -214,6 +236,8 @@ function CreateTicketPopUp() {
                     variant="outlined"
                     value={formData.reporter}
                     onChange={handleOnChange}
+                    required
+                    onBlur={(e) => validateField("reporter", e.target.value)}
                     error={!!errors.reporter}
                     helperText={errors.reporter}
                   />
@@ -223,11 +247,12 @@ function CreateTicketPopUp() {
                     margin="dense"
                     error={!!errors.category}
                   >
-                    <InputLabel>Category</InputLabel>
+                    <InputLabel required>Category</InputLabel>
                     <Select
                       name="category"
                       value={formData.category}
                       onChange={handleOnChange}
+                      onBlur={(e) => validateField("category", e.target.value)}
                       label="Category"
                     >
                       <MenuItem value="bug">Bug</MenuItem>
