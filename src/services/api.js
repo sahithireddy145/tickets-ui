@@ -72,7 +72,9 @@ export function createNewTicket(newTicket) {
 
       if (!res.ok) {
         const errorText = await res.text();
+        dispatch(setCreateTicketLoading(false));
         dispatch(setErrorMessage(errorText));
+
         return false;
       }
 
