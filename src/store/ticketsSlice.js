@@ -20,14 +20,6 @@ const ticketsSlice = createSlice({
     setTicketItem: (state, action) => {
       state.currentTicket = action.payload;
     },
-    addTicket: (state, action) => {
-      state.tickets.push(action.payload);
-    },
-    removeTicket: (state, action) => {
-      state.tickets = state.tickets.filter(
-        (ticket) => ticket.id !== action.payload
-      );
-    },
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
@@ -45,8 +37,6 @@ const ticketsSlice = createSlice({
 
 export const {
   getTickets,
-  addTicket,
-  removeTicket,
   setLoading,
   setTicketItem,
   setCurrentTicketLoading,
