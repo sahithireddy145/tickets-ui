@@ -13,6 +13,12 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import {
+  getAssigneeLabel,
+  getCategoryLabel,
+  getPriorityLabel,
+  getStatusLabel,
+} from "../utils/utils";
 
 function TicketsView() {
   const navigate = useNavigate();
@@ -76,15 +82,22 @@ function TicketsView() {
                 >
                   <td>{ticket.id}</td>
                   <td>{ticket.title}</td>
-                  <td>{ticket.status}</td>
-                  <td>{ticket.priority}</td>
-                  <td>{ticket.assignee}</td>
+                  <td>{getStatusLabel(ticket.status)}</td>
+                  <td>{getPriorityLabel(ticket.priority)}</td>
+                  <td>{getAssigneeLabel(ticket.assignee)}</td>
                   <td>{ticket.reporter}</td>
-                  <td>{ticket.category}</td>
-                  <td>{new Date(ticket.created_at).toLocaleString()}</td>
+                  <td>{getCategoryLabel(ticket.category)}</td>
+                  <td>{new Date(ticket.created_at).toDateString()}</td>
 
                   <td onDoubleClick={(e) => e.stopPropagation()}>
-                    <button style={{ cursor: "pointer" }}>Edit</button>
+                    <button
+                      style={{ cursor: "pointer" }}
+                      onClick={() =>
+                        navigate(`/ticket?id=${ticket.id}&editable=true`)
+                      }
+                    >
+                      Edit
+                    </button>
                     <button
                       style={{ cursor: "pointer" }}
                       onClick={() => handleDeleteButton(ticket)}
