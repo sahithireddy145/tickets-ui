@@ -19,6 +19,12 @@ import { createNewTicket } from "../services/api";
 import { useDispatch, useSelector } from "react-redux";
 import Spinner from "../ui/Spinner";
 import { setCreateTicketLoading, setErrorMessage } from "../store/ticketsSlice";
+import {
+  ASSIGNEE_OPTIONS,
+  CATEGORY_OPTIONS,
+  PRIORITY_OPTIONS,
+  STATUS_OPTIONS,
+} from "./constants/constants";
 
 function CreateTicketPopUp() {
   const initialState = {
@@ -150,9 +156,9 @@ function CreateTicketPopUp() {
                       onBlur={(e) => validateField("status", e.target.value)}
                       label="Status"
                     >
-                      <MenuItem value="open">Open</MenuItem>
-                      <MenuItem value="inprogress">In-Progress</MenuItem>
-                      <MenuItem value="closed">Closed</MenuItem>
+                      {STATUS_OPTIONS.map((option) => (
+                        <MenuItem value={option.value}>{option.label}</MenuItem>
+                      ))}
                     </Select>
                     {errors.status && (
                       <span style={{ color: "red", fontSize: "0.8rem" }}>
@@ -174,10 +180,9 @@ function CreateTicketPopUp() {
                       onBlur={(e) => validateField("priority", e.target.value)}
                       label="Priority"
                     >
-                      <MenuItem value="urgent">Urgent</MenuItem>
-                      <MenuItem value="high">High</MenuItem>
-                      <MenuItem value="medium">Medium</MenuItem>
-                      <MenuItem value="low">Low</MenuItem>
+                      {PRIORITY_OPTIONS.map((option) => (
+                        <MenuItem value={option.value}>{option.label}</MenuItem>
+                      ))}
                     </Select>
                     {errors.priority && (
                       <span style={{ color: "red", fontSize: "0.8rem" }}>
@@ -217,11 +222,9 @@ function CreateTicketPopUp() {
                       onBlur={(e) => validateField("assignee", e.target.value)}
                       label="Assignee"
                     >
-                      <MenuItem value="sai@tyujhgfji.com">Sai Prasad</MenuItem>
-                      <MenuItem value="sahithi@kjhagekyhgfbegr.com">
-                        Sahithi
-                      </MenuItem>
-                      <MenuItem value="shiva@kjkjhghrrg.com">Shiva</MenuItem>
+                      {ASSIGNEE_OPTIONS.map((option) => (
+                        <MenuItem value={option.value}>{option.label}</MenuItem>
+                      ))}
                     </Select>
                     {errors.assignee && (
                       <span style={{ color: "red", fontSize: "0.8rem" }}>
@@ -258,9 +261,9 @@ function CreateTicketPopUp() {
                       onBlur={(e) => validateField("category", e.target.value)}
                       label="Category"
                     >
-                      <MenuItem value="bug">Bug</MenuItem>
-                      <MenuItem value="feature">Feature</MenuItem>
-                      <MenuItem value="support">Support</MenuItem>
+                      {CATEGORY_OPTIONS.map((option) => (
+                        <MenuItem value={option.value}>{option.label}</MenuItem>
+                      ))}
                     </Select>
                     {errors.category && (
                       <span style={{ color: "red", fontSize: "0.8rem" }}>
