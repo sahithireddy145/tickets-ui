@@ -1,14 +1,27 @@
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
-import { fetchTickets } from "../services/api";
+import { useEffect, useState } from "react";
+import { deleteTicket, fetchTickets } from "../services/api";
 import { setLoading } from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
 import CreateTicketPopUp from "./CreateTicket";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogActions,
+  Button,
+  Typography,
+} from "@mui/material";
 
 function TicketsView() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [toBeDeleted, setToBeDeleted] = useState(null);
+  const [confirmedDeleteId, setConfirmedDeleteId] = useState(null);
 
   const { tickets, loading } = useSelector((state) => state.tickets);
 
@@ -16,6 +29,21 @@ function TicketsView() {
     dispatch(setLoading(true));
     dispatch(fetchTickets());
   }, [dispatch]);
+
+  function handleDeleteButton(ticket) {
+    setIsOpen(true);
+    setConfirmedDeleteId(ticket.id);
+    setToBeDeleted(ticket);
+  }
+
+  function handleConfirmDelete() {
+    dispatch(deleteTicket(confirmedDeleteId));
+    setIsOpen(false);
+  }
+
+  function handleOnCancel() {
+    setIsOpen(false);
+  }
 
   return (
     <>
@@ -57,7 +85,12 @@ function TicketsView() {
 
                   <td onDoubleClick={(e) => e.stopPropagation()}>
                     <button style={{ cursor: "pointer" }}>Edit</button>
-                    <button style={{ cursor: "pointer" }}>Delete</button>
+                    <button
+                      style={{ cursor: "pointer" }}
+                      onClick={() => handleDeleteButton(ticket)}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -73,6 +106,35 @@ function TicketsView() {
       <div style={{ marginTop: "20px" }}>
         <CreateTicketPopUp />
       </div>
+
+      {/* Delete dialog */}
+      <Dialog open={isOpen} maxWidth="md" fullWidth onClose={handleOnCancel}>
+        <>
+          <DialogTitle sx={{ textAlign: "center" }}>
+            Do you want to Delete the ticket?
+          </DialogTitle>
+          <DialogContent>
+            <Typography variant="body1" color="text.primary">
+              Title: {toBeDeleted?.title || ""}
+            </Typography>{" "}
+            <Typography variant="body1" color="text.primary">
+              Status: {toBeDeleted?.status || ""}
+            </Typography>{" "}
+          </DialogContent>
+          <DialogActions sx={{ justifyContent: "center" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleConfirmDelete}
+            >
+              Delete the ticket
+            </Button>
+            <Button variant="contained" onClick={handleOnCancel}>
+              Cancel
+            </Button>
+          </DialogActions>
+        </>
+      </Dialog>
     </>
   );
 }

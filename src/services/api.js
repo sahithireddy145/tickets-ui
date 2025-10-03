@@ -3,7 +3,6 @@ import {
   setTicketItem,
   setLoading,
   setCurrentTicketLoading,
-  addTicket,
   setErrorMessage,
   setCreateTicketLoading,
 } from "../store/ticketsSlice";
@@ -73,16 +72,11 @@ export function createNewTicket(newTicket) {
       if (!res.ok) {
         const error = await res.text();
         const errorText = JSON.parse(error).message;
-        // console.log("Coming from api: ", errorText.message);
         dispatch(setCreateTicketLoading(false));
         dispatch(setErrorMessage(errorText));
 
         return false;
       }
-
-      const data = await res.json();
-      console.log("Ticket Created: ", data[0]);
-      dispatch(addTicket(data[0]));
       dispatch(setErrorMessage(null));
       dispatch(fetchTickets());
 
@@ -90,6 +84,51 @@ export function createNewTicket(newTicket) {
     } catch (err) {
       console.error("❌ Error creating ticket:", err.message);
       dispatch(setErrorMessage(err.message));
+      dispatch(setCreateTicketLoading(false));
+    }
+  };
+}
+
+export function deleteTicket(id) {
+  return async function (dispatch) {
+    try {
+      console.log("Delete Ticket called");
+      const res = await fetch(`${API_URL}?id=eq.${id}`, {
+        method: "DELETE",
+        headers: HEADERS,
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        const errorText = JSON.parse(error).message;
+        console.log(errorText);
+      }
+
+      dispatch(fetchTickets());
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+}
+
+export function editTicket(id) {
+  return async function (dispatch) {
+    try {
+      console.log("Update Ticket called");
+      const res = await fetch(`${API_URL}?id=eq.${id}`, {
+        method: "PATCH",
+        headers: HEADERS,
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        const errorText = JSON.parse(error).message;
+        console.log(errorText);
+      }
+
+      dispatch(fetchTickets());
+    } catch (err) {
+      console.error(err.message);
     }
   };
 }

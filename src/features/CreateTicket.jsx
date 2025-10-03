@@ -12,6 +12,7 @@ import {
   Typography,
   Grid,
   Alert,
+  Box,
 } from "@mui/material";
 import { useState } from "react";
 import { createNewTicket } from "../services/api";
@@ -107,9 +108,11 @@ function CreateTicketPopUp() {
 
   return (
     <div>
-      <Button variant="contained" onClick={handleCreateTicket}>
-        Create Ticket
-      </Button>
+      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
+        <Button variant="contained" onClick={handleCreateTicket}>
+          Create Ticket
+        </Button>
+      </Box>
 
       <Dialog open={isOpen} onClose={handleOnCancel} maxWidth="md" fullWidth>
         {isNewTicketLoading ? (
