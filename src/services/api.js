@@ -111,13 +111,14 @@ export function deleteTicket(id) {
   };
 }
 
-export function editTicket(id) {
+export function editTicket(id, updatedTicket) {
   return async function (dispatch) {
     try {
       console.log("Update Ticket called");
       const res = await fetch(`${API_URL}?id=eq.${id}`, {
         method: "PATCH",
         headers: HEADERS,
+        body: JSON.stringify(updatedTicket),
       });
 
       if (!res.ok) {
@@ -125,8 +126,7 @@ export function editTicket(id) {
         const errorText = JSON.parse(error).message;
         console.log(errorText);
       }
-
-      dispatch(fetchTickets());
+      dispatch(setTicketItem(updatedTicket));
     } catch (err) {
       console.error(err.message);
     }

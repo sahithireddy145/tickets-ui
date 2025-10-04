@@ -19,6 +19,7 @@ import {
   getPriorityLabel,
   getStatusLabel,
 } from "../utils/utils";
+import DeleteDialog from "../ui/DeleteDialog";
 
 function TicketsView() {
   const navigate = useNavigate();
@@ -91,7 +92,7 @@ function TicketsView() {
 
                   <td onDoubleClick={(e) => e.stopPropagation()}>
                     <button
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: "pointer", margin: "5px" }}
                       onClick={() =>
                         navigate(`/ticket?id=${ticket.id}&editable=true`)
                       }
@@ -121,33 +122,13 @@ function TicketsView() {
       </div>
 
       {/* Delete dialog */}
-      <Dialog open={isOpen} maxWidth="md" fullWidth onClose={handleOnCancel}>
-        <>
-          <DialogTitle sx={{ textAlign: "center" }}>
-            Do you want to Delete the ticket?
-          </DialogTitle>
-          <DialogContent>
-            <Typography variant="body1" color="text.primary">
-              Title: {toBeDeleted?.title || ""}
-            </Typography>{" "}
-            <Typography variant="body1" color="text.primary">
-              Status: {toBeDeleted?.status || ""}
-            </Typography>{" "}
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: "center" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleConfirmDelete}
-            >
-              Delete the ticket
-            </Button>
-            <Button variant="contained" onClick={handleOnCancel}>
-              Cancel
-            </Button>
-          </DialogActions>
-        </>
-      </Dialog>
+
+      <DeleteDialog
+        isOpen={isOpen}
+        handleOnCancel={handleOnCancel}
+        toBeDeleted={toBeDeleted}
+        handleConfirmDelete={handleConfirmDelete}
+      />
     </>
   );
 }

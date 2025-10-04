@@ -15,6 +15,10 @@ export const CATEGORY_OPTIONS = [
 
 export const STATUS_OPTIONS = [
   {
+    value: "",
+    label: "",
+  },
+  {
     value: "open",
     label: "Open",
   },
@@ -77,3 +81,17 @@ export const ASSIGNEE_OPTIONS = [
     label: "Durga Test",
   },
 ];
+
+export const VALIDATION_RULES = {
+  title: (value) => (!value ? "Title is required" : ""),
+  description: (value) => (!value ? "Description is required" : ""),
+  status: (value) => (!value ? "Status is required" : ""),
+  priority: (value) => (!value ? "Priority is required" : ""),
+  assignee: (value) => (!value ? "Assignee is required" : ""),
+  reporter: (value) => {
+    if (!value) return "Reporter is required";
+    if (!/\S+@\S+\.\S+/.test(value)) return "Reporter email is invalid";
+    return "";
+  },
+  category: (value) => (!value ? "Category is required" : ""),
+};

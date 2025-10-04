@@ -24,7 +24,8 @@ import {
   CATEGORY_OPTIONS,
   PRIORITY_OPTIONS,
   STATUS_OPTIONS,
-} from "./constants/constants";
+  VALIDATION_RULES,
+} from "../constants/constants";
 
 function CreateTicketPopUp() {
   const initialState = {
@@ -45,24 +46,9 @@ function CreateTicketPopUp() {
     (state) => state.tickets
   );
 
-  // ✅ centralized validation rules
-  const rules = {
-    title: (value) => (!value ? "Title is required" : ""),
-    description: (value) => (!value ? "Description is required" : ""),
-    status: (value) => (!value ? "Status is required" : ""),
-    priority: (value) => (!value ? "Priority is required" : ""),
-    assignee: (value) => (!value ? "Assignee is required" : ""),
-    reporter: (value) => {
-      if (!value) return "Reporter is required";
-      if (!/\S+@\S+\.\S+/.test(value)) return "Reporter email is invalid";
-      return "";
-    },
-    category: (value) => (!value ? "Category is required" : ""),
-  };
-
   // ✅ validate a single field
   function validateField(name, value) {
-    const message = rules[name] ? rules[name](value) : "";
+    const message = VALIDATION_RULES[name] ? VALIDATION_RULES[name](value) : "";
     setErrors((prev) => ({
       ...prev,
       [name]: message || undefined,
@@ -96,8 +82,8 @@ function CreateTicketPopUp() {
 
   function handleSubmit() {
     let tempErrors = {};
-    Object.keys(rules).forEach((field) => {
-      const msg = rules[field](formData[field]);
+    Object.keys(VALIDATION_RULES).forEach((field) => {
+      const msg = VALIDATION_RULES[field](formData[field]);
       if (msg) tempErrors[field] = msg;
     });
 
