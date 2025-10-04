@@ -5,14 +5,7 @@ import { deleteTicket, fetchTickets } from "../services/api";
 import { setLoading } from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
 import CreateTicketPopUp from "./CreateTicket";
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogActions,
-  Button,
-  Typography,
-} from "@mui/material";
+
 import {
   getAssigneeLabel,
   getCategoryLabel,
