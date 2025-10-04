@@ -1,7 +1,6 @@
 import {
   getTickets,
   setTicketItem,
-  setLoading,
   setCurrentTicketLoading,
   setErrorMessage,
   setCreateTicketLoading,
@@ -89,28 +88,6 @@ export function createNewTicket(newTicket) {
   };
 }
 
-export function deleteTicket(id) {
-  return async function (dispatch) {
-    try {
-      console.log("Delete Ticket called");
-      const res = await fetch(`${API_URL}?id=eq.${id}`, {
-        method: "DELETE",
-        headers: HEADERS,
-      });
-
-      if (!res.ok) {
-        const error = await res.text();
-        const errorText = JSON.parse(error).message;
-        console.log(errorText);
-      }
-
-      dispatch(fetchTickets());
-    } catch (err) {
-      console.error(err.message);
-    }
-  };
-}
-
 export function editTicket(id, updatedTicket) {
   return async function (dispatch) {
     try {
@@ -127,6 +104,28 @@ export function editTicket(id, updatedTicket) {
         console.log(errorText);
       }
       dispatch(setTicketItem(updatedTicket));
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+}
+
+export function deleteTicket(id) {
+  return async function (dispatch) {
+    try {
+      console.log("Delete Ticket called");
+      const res = await fetch(`${API_URL}?id=eq.${id}`, {
+        method: "DELETE",
+        headers: HEADERS,
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        const errorText = JSON.parse(error).message;
+        console.log(errorText);
+      }
+
+      dispatch(fetchTickets());
     } catch (err) {
       console.error(err.message);
     }

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { deleteTicket, editTicket, fetchTicketById } from "../services/api";
 import Spinner from "../ui/Spinner";
-import InvalidTicket from "./InvalidTicket";
+import InvalidTicket from "../ui/InvalidTicket";
 import { setTicketItem } from "../store/ticketsSlice";
 import {
   Box,
