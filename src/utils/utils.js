@@ -3,7 +3,7 @@ import {
   CATEGORY_OPTIONS,
   PRIORITY_OPTIONS,
   STATUS_OPTIONS,
-} from "../features/constants/constants";
+} from "../constants/constants";
 
 export function getStatusLabel(value) {
   const stausObj = STATUS_OPTIONS.find((option) => option.value === value);
