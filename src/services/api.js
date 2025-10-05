@@ -17,22 +17,32 @@ const HEADERS = {
   apikey: API_KEY,
   Authorization: `Bearer ${API_KEY}`,
   "Content-Type": "application/json",
-  Prefer: "return=representation",
+  Prefer: "count=exact",
 };
 
-export function fetchTickets() {
+export function fetchTickets(page = 1, itemsPerPage = 5) {
   return async function (dispatch) {
     try {
-      const res = await fetch(API_URL, {
-        headers: HEADERS,
+      const start = (page - 1) * itemsPerPage;
+      const end = start + itemsPerPage - 1;
+
+      const res = await fetch(`${API_URL}?select=*`, {
+        headers: { ...HEADERS, Range: `${start}-${end}` },
       });
+
       const data = await res.json();
+
+      const contentRange = res.headers.get("content-range"); // e.g. "0-4/57"
+      const totalTicketCount = contentRange
+        ? parseInt(contentRange.split("/")[1], 10)
+        : 0;
+      console.log("Total tickets:", totalTicketCount);
 
       if (!data) return <Spinner />;
 
-      dispatch(getTickets(data));
+      dispatch(getTickets({ data, totalTicketCount }));
     } catch (err) {
-      console.log(err);
+      console.error("I am coming from fetch tickets call in api.js ", err);
     }
   };
 }
@@ -110,7 +120,7 @@ export function editTicket(id, updatedTicket) {
   };
 }
 
-export function deleteTicket(id) {
+export function deleteTicket(id, page = 1, ticketsPerPage = 5) {
   return async function (dispatch) {
     try {
       console.log("Delete Ticket called");
@@ -125,7 +135,7 @@ export function deleteTicket(id) {
         console.log(errorText);
       }
 
-      dispatch(fetchTickets());
+      dispatch(fetchTickets(page, ticketsPerPage));
     } catch (err) {
       console.error(err.message);
     }

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   tickets: [],
+  totalTicketCount: 0,
   loading: false,
   currentTicket: null,
   currentTicketLoading: true,
@@ -14,8 +15,9 @@ const ticketsSlice = createSlice({
   initialState,
   reducers: {
     getTickets: (state, action) => {
-      state.tickets = action.payload;
-      state.loading = false; // data finished loading
+      state.tickets = action.payload.data;
+      state.totalTicketCount = action.payload.totalTicketCount;
+      state.loading = false;
     },
     setTicketItem: (state, action) => {
       state.currentTicket = action.payload;

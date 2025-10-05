@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { deleteTicket, fetchTickets } from "../services/api";
@@ -6,29 +5,29 @@ import { setLoading } from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
 import CreateTicketPopUp from "./CreateTicket";
 
-import {
-  getAssigneeLabel,
-  getCategoryLabel,
-  getPriorityLabel,
-  getStatusLabel,
-} from "../utils/utils";
 import DeleteDialog from "../ui/DeleteDialog";
+import PaginationComponent from "../ui/PaginationComponent";
+import { Box, FormControl, MenuItem, Select } from "@mui/material";
 
 function TicketsView() {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [paginationUI, setPaginationUI] = useState(null);
+  const [ticketsPerPage, setTicketsPerPage] = useState(10);
 
   const [toBeDeleted, setToBeDeleted] = useState(null);
   const [confirmedDeleteId, setConfirmedDeleteId] = useState(null);
 
-  const { tickets, loading } = useSelector((state) => state.tickets);
+  const { tickets, totalTicketCount, loading } = useSelector(
+    (state) => state.tickets
+  );
 
   useEffect(() => {
     dispatch(setLoading(true));
-    dispatch(fetchTickets());
-  }, [dispatch]);
+    dispatch(fetchTickets(page, ticketsPerPage));
+  }, [dispatch, page, ticketsPerPage]);
 
   function handleDeleteButton(ticket) {
     setIsOpen(true);
@@ -37,13 +36,20 @@ function TicketsView() {
   }
 
   function handleConfirmDelete() {
-    dispatch(deleteTicket(confirmedDeleteId));
+    dispatch(deleteTicket(confirmedDeleteId, page, ticketsPerPage));
     setIsOpen(false);
   }
 
   function handleOnCancel() {
     setIsOpen(false);
   }
+
+  function handleOnTicketCountChange(e) {
+    setTicketsPerPage(e.target.value);
+    setPage(1);
+  }
+
+  console.log("I am tickets per page", ticketsPerPage);
 
   return (
     <>
@@ -53,56 +59,76 @@ function TicketsView() {
         {loading ? (
           <Spinner />
         ) : tickets.length > 0 ? (
-          <table border="1" cellPadding="10" cellSpacing="0" width="100%">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Assignee</th>
-                <th>Reporter</th>
-                <th>Category</th>
-                <th>Created At</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr
-                  key={ticket.id}
-                  onDoubleClick={() => navigate(`/ticket?id=${ticket.id}`)}
-                  style={{ cursor: "default" }}
-                >
-                  <td>{ticket.id}</td>
-                  <td>{ticket.title}</td>
-                  <td>{getStatusLabel(ticket.status)}</td>
-                  <td>{getPriorityLabel(ticket.priority)}</td>
-                  <td>{getAssigneeLabel(ticket.assignee)}</td>
-                  <td>{ticket.reporter}</td>
-                  <td>{getCategoryLabel(ticket.category)}</td>
-                  <td>{new Date(ticket.created_at).toDateString()}</td>
-
-                  <td onDoubleClick={(e) => e.stopPropagation()}>
-                    <button
-                      style={{ cursor: "pointer", margin: "5px" }}
-                      onClick={() =>
-                        navigate(`/ticket?id=${ticket.id}&editable=true`)
-                      }
-                    >
-                      Edit
-                    </button>
-                    <button
-                      style={{ cursor: "pointer" }}
-                      onClick={() => handleDeleteButton(ticket)}
-                    >
-                      Delete
-                    </button>
-                  </td>
+          <>
+            {" "}
+            <table border="1" cellPadding="10" cellSpacing="0" width="100%">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Assignee</th>
+                  <th>Reporter</th>
+                  <th>Category</th>
+                  <th>Created At</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                <PaginationComponent
+                  tickets={tickets}
+                  itemsPerPage={ticketsPerPage}
+                  handleDeleteButton={handleDeleteButton}
+                  setPaginationUI={setPaginationUI}
+                  page={page}
+                  setPage={setPage}
+                  totalTicketCount={totalTicketCount}
+                />
+              </tbody>
+            </table>
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center", // centers the whole group
+                alignItems: "center",
+                marginTop: "20px",
+                gap: 2, // space between dropdown and pagination
+              }}
+            >
+              <FormControl
+                size="small"
+                sx={{
+                  minWidth: 60, // control width
+                }}
+              >
+                {/* <InputLabel id="ticket_count">Tickets per page</InputLabel> */}
+                <Select
+                  labelId="ticket_count"
+                  id="ticket_count"
+                  value={ticketsPerPage}
+                  // label="Tickets per page"
+                  onChange={handleOnTicketCountChange}
+                >
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={20}>20</MenuItem>
+                </Select>
+              </FormControl>
+
+              {paginationUI}
+            </Box>
+            {/* <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                marginTop: "20px",
+              }}
+            >
+              {paginationUI}
+            </div> */}
+          </>
         ) : (
           <p style={{ textAlign: "center", marginTop: "20px" }}>
             No tickets found
