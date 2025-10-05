@@ -95,3 +95,5 @@ export const ASSIGNEE_OPTIONS = [
     label: "Durga Test",
   },
 ];
+
+export const ITEMS_PER_PAGE = 5;
