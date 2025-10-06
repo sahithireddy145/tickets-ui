@@ -17,6 +17,8 @@ import {
   Stack,
 } from "@mui/material";
 
+import { format } from "date-fns";
+
 import {
   ASSIGNEE_OPTIONS,
   CATEGORY_OPTIONS,
@@ -320,7 +322,12 @@ function TicketDetails() {
             </Typography>
             <Typography>
               <strong>Created At:</strong>{" "}
-              {new Date(currentTicket.created_at).toLocaleString()}
+              {currentTicket.created_at
+                ? format(
+                    new Date(currentTicket.created_at),
+                    "dd MMM yyyy • hh:mm a"
+                  )
+                : "—"}
             </Typography>
 
             <Stack direction="row" spacing={2} mt={2}>
