@@ -5,6 +5,7 @@ const initialState = {
   totalTicketCount: 0,
   loading: false,
   currentTicket: null,
+  searchText: null,
   currentTicketLoading: true,
   errorMessage: "",
   isNewTicketLoading: false,
@@ -17,10 +18,15 @@ const ticketsSlice = createSlice({
     getTickets: (state, action) => {
       state.tickets = action.payload.data;
       state.totalTicketCount = action.payload.totalTicketCount;
+
       state.loading = false;
     },
     setTicketItem: (state, action) => {
       state.currentTicket = action.payload;
+    },
+
+    setSearchText: (state, action) => {
+      state.searchText = action.payload;
     },
     setLoading: (state, action) => {
       state.loading = action.payload;
@@ -44,5 +50,6 @@ export const {
   setCurrentTicketLoading,
   setErrorMessage,
   setCreateTicketLoading,
+  setSearchText,
 } = ticketsSlice.actions;
 export default ticketsSlice.reducer;
