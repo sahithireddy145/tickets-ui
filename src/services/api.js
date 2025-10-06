@@ -23,6 +23,8 @@ const HEADERS = {
 export function fetchTickets(page = 1, itemsPerPage = 5) {
   return async function (dispatch) {
     try {
+      console.log("I am tickets Per Page in fetch tickets", itemsPerPage);
+
       const start = (page - 1) * itemsPerPage;
       const end = start + itemsPerPage - 1;
 
@@ -120,7 +122,7 @@ export function editTicket(id, updatedTicket) {
   };
 }
 
-export function deleteTicket(id, page = 1, ticketsPerPage = 5) {
+export function deleteTicket(id, page = 1, ticketsPerPage = 5, noFetch) {
   return async function (dispatch) {
     try {
       console.log("Delete Ticket called");
@@ -134,8 +136,8 @@ export function deleteTicket(id, page = 1, ticketsPerPage = 5) {
         const errorText = JSON.parse(error).message;
         console.log(errorText);
       }
-
-      dispatch(fetchTickets(page, ticketsPerPage));
+      console.log("I am tickets Per Page", ticketsPerPage);
+      if (!noFetch) dispatch(fetchTickets(page, ticketsPerPage));
     } catch (err) {
       console.error(err.message);
     }
