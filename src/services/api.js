@@ -20,15 +20,17 @@ const HEADERS = {
   Prefer: "count=exact",
 };
 
-export function fetchTickets(page = 1, itemsPerPage = 5) {
+export function fetchTickets(page = 1, itemsPerPage = 5, searchValue) {
   return async function (dispatch) {
     try {
-      console.log("I am tickets Per Page in fetch tickets", itemsPerPage);
-
       const start = (page - 1) * itemsPerPage;
       const end = start + itemsPerPage - 1;
 
-      const res = await fetch(`${API_URL}?select=*`, {
+      let url = `${API_URL}?select=*`;
+
+      if (searchValue) url = `${API_URL}?title=ilike.*${searchValue}*`;
+
+      const res = await fetch(url, {
         headers: { ...HEADERS, Range: `${start}-${end}` },
       });
 
@@ -38,7 +40,6 @@ export function fetchTickets(page = 1, itemsPerPage = 5) {
       const totalTicketCount = contentRange
         ? parseInt(contentRange.split("/")[1], 10)
         : 0;
-      console.log("Total tickets:", totalTicketCount);
 
       if (!data) return <Spinner />;
 
@@ -69,6 +70,25 @@ export function fetchTicketById(id) {
   };
 }
 
+// export function fetchTicketsByTitle(searchValue) {
+//   return async function (dispatch) {
+//     try {
+//       const res = await fetch(`${API_URL}?title=ilike.*${searchValue}*`, {
+//         headers: HEADERS,
+//       });
+
+//       if (!res.ok) throw new Error("Failed to fetch");
+//       const data = await res.json();
+
+//       dispatch(getTickets({ data , totalTicketCount}));
+
+//       console.log(data);
+//     } catch (err) {
+//       console.error("I am coming from title fetch: ", err.message);
+//     }
+//   };
+// }
+
 export function createNewTicket(newTicket) {
   return async function (dispatch) {
     try {
@@ -89,7 +109,7 @@ export function createNewTicket(newTicket) {
         return false;
       }
       dispatch(setErrorMessage(null));
-      dispatch(fetchTickets());
+      dispatch(fetchTickets(1, 10));
 
       return true;
     } catch (err) {
@@ -123,7 +143,7 @@ export function editTicket(id, updatedTicket) {
 }
 
 export function deleteTicket(id, page = 1, ticketsPerPage = 5, noFetch) {
-  return async function (dispatch) {
+  return async function (dispatch, getState) {
     try {
       console.log("Delete Ticket called");
       const res = await fetch(`${API_URL}?id=eq.${id}`, {
@@ -136,8 +156,10 @@ export function deleteTicket(id, page = 1, ticketsPerPage = 5, noFetch) {
         const errorText = JSON.parse(error).message;
         console.log(errorText);
       }
+      const state = getState();
       console.log("I am tickets Per Page", ticketsPerPage);
-      if (!noFetch) dispatch(fetchTickets(page, ticketsPerPage));
+      if (!noFetch)
+        dispatch(fetchTickets(page, ticketsPerPage, state.tickets.searchText));
     } catch (err) {
       console.error(err.message);
     }

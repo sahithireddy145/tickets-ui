@@ -32,8 +32,6 @@ function PaginationComponent({
 
   // console.log("Current page Data", currentPageData);
 
-  console.log("I am at page: ", page);
-
   useEffect(() => {
     if (setPaginationUI) {
       setPaginationUI(
@@ -47,8 +45,6 @@ function PaginationComponent({
       );
     }
   }, [setPaginationUI, totalPages, page, setPage]);
-
-  console.log("I am at page: ", page);
 
   return (
     <>

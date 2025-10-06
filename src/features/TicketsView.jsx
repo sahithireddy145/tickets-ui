@@ -8,6 +8,7 @@ import CreateTicketPopUp from "./CreateTicket";
 import DeleteDialog from "../ui/DeleteDialog";
 import PaginationComponent from "../ui/PaginationComponent";
 import { Box, FormControl, MenuItem, Select } from "@mui/material";
+import SearchComponent from "../ui/SearchComponent";
 
 function TicketsView() {
   const dispatch = useDispatch();
@@ -20,14 +21,15 @@ function TicketsView() {
   const [toBeDeleted, setToBeDeleted] = useState(null);
   const [confirmedDeleteId, setConfirmedDeleteId] = useState(null);
 
-  const { tickets, totalTicketCount, loading } = useSelector(
+  const { tickets, totalTicketCount, loading, searchText } = useSelector(
     (state) => state.tickets
   );
 
   useEffect(() => {
     dispatch(setLoading(true));
-    dispatch(fetchTickets(page, ticketsPerPage));
-  }, [dispatch, page, ticketsPerPage]);
+    console.log("TicketsView use Effect ", searchText);
+    dispatch(fetchTickets(page, ticketsPerPage, searchText));
+  }, [dispatch, page, ticketsPerPage, searchText]);
 
   useEffect(
     function () {
@@ -58,12 +60,16 @@ function TicketsView() {
     setPage(1);
   }
 
-  console.log("I am tickets per page", ticketsPerPage);
-
   return (
     <>
       <div>
         <h2>Tickets</h2>
+        <SearchComponent
+          page={page}
+          setPage={setPage}
+          itemsPerPage={ticketsPerPage}
+          setTicketsPerPage={setTicketsPerPage}
+        />
 
         {loading ? (
           <Spinner />
@@ -120,6 +126,7 @@ function TicketsView() {
                   onChange={handleOnTicketCountChange}
                 >
                   {/* <MenuItem value={2}>2</MenuItem> */}
+                  <MenuItem value={3}>3</MenuItem>
                   <MenuItem value={5}>5</MenuItem>
                   <MenuItem value={10}>10</MenuItem>
                   <MenuItem value={20}>20</MenuItem>

@@ -14,6 +14,7 @@ import {
 } from "../utils/utils";
 import DeleteDialog from "../ui/DeleteDialog";
 import PaginationComponent from "../ui/PaginationComponent";
+import Search from "../ui/SearchComponent";
 
 function TicketsView() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ function TicketsView() {
 
   useEffect(() => {
     dispatch(setLoading(true));
+
     dispatch(fetchTickets());
   }, [dispatch]);
 
