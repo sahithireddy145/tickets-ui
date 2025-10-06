@@ -6,7 +6,8 @@ import {
   getStatusLabel,
 } from "../utils/utils";
 import { useNavigate } from "react-router-dom";
-import { Pagination } from "@mui/material";
+import { Pagination, Tooltip } from "@mui/material";
+import { format } from "date-fns";
 
 function PaginationComponent({
   tickets,
@@ -57,14 +58,26 @@ function PaginationComponent({
           onDoubleClick={() => navigate(`/ticket?id=${ticket.id}`)}
           style={{ cursor: "default" }}
         >
-          <td>{ticket.id}</td>
+          <td>
+            <Tooltip title={ticket.id}>
+              <span>{ticket.id.slice(-6)}</span>
+            </Tooltip>
+          </td>
           <td>{ticket.title}</td>
           <td>{getStatusLabel(ticket.status)}</td>
           <td>{getPriorityLabel(ticket.priority)}</td>
-          <td>{getAssigneeLabel(ticket.assignee)}</td>
+          <td>
+            <Tooltip title={ticket.assignee}>
+              <span> {getAssigneeLabel(ticket.assignee)}</span>
+            </Tooltip>
+          </td>
           <td>{ticket.reporter}</td>
           <td>{getCategoryLabel(ticket.category)}</td>
-          <td>{new Date(ticket.created_at).toDateString()}</td>
+          <td>
+            {ticket.created_at
+              ? format(new Date(ticket.created_at), "dd MMM yyyy • hh:mm a")
+              : "—"}
+          </td>
 
           <td onDoubleClick={(e) => e.stopPropagation()}>
             <button
