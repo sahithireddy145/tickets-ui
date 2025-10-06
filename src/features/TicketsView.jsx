@@ -29,6 +29,15 @@ function TicketsView() {
     dispatch(fetchTickets(page, ticketsPerPage));
   }, [dispatch, page, ticketsPerPage]);
 
+  useEffect(
+    function () {
+      if (!loading && tickets.length === 0 && page > 1) {
+        setPage((page) => (page > 1 ? page - 1 : page));
+      }
+    },
+    [tickets, loading]
+  );
+
   function handleDeleteButton(ticket) {
     setIsOpen(true);
     setConfirmedDeleteId(ticket.id);
@@ -58,7 +67,7 @@ function TicketsView() {
 
         {loading ? (
           <Spinner />
-        ) : tickets.length > 0 ? (
+        ) : totalTicketCount > 0 ? (
           <>
             {" "}
             <table border="1" cellPadding="10" cellSpacing="0" width="100%">
@@ -110,6 +119,7 @@ function TicketsView() {
                   // label="Tickets per page"
                   onChange={handleOnTicketCountChange}
                 >
+                  {/* <MenuItem value={2}>2</MenuItem> */}
                   <MenuItem value={5}>5</MenuItem>
                   <MenuItem value={10}>10</MenuItem>
                   <MenuItem value={20}>20</MenuItem>

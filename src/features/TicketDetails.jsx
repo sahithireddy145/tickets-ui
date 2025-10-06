@@ -129,7 +129,7 @@ function TicketDetails() {
   }
 
   function handleConfirmDelete() {
-    dispatch(deleteTicket(id));
+    dispatch(deleteTicket(id, null, null, true));
     navigate("/");
     setIsOpen(false);
   }
