@@ -9,6 +9,7 @@ const initialState = {
   currentTicketLoading: true,
   errorMessage: "",
   isNewTicketLoading: false,
+  filters: null,
 };
 
 const ticketsSlice = createSlice({
@@ -37,6 +38,9 @@ const ticketsSlice = createSlice({
     setCreateTicketLoading: (state, action) => {
       state.isNewTicketLoading = action.payload;
     },
+    setFilters: (state, action) => {
+      state.filters = action.payload;
+    },
     setErrorMessage: (state, action) => {
       state.errorMessage = action.payload;
     },
@@ -51,5 +55,6 @@ export const {
   setErrorMessage,
   setCreateTicketLoading,
   setSearchText,
+  setFilters,
 } = ticketsSlice.actions;
 export default ticketsSlice.reducer;

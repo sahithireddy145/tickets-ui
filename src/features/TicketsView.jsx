@@ -1,14 +1,24 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { deleteTicket, fetchTickets } from "../services/api";
-import { setLoading } from "../store/ticketsSlice";
+import { setFilters, setLoading } from "../store/ticketsSlice";
 import Spinner from "../ui/Spinner";
 import CreateTicketPopUp from "./CreateTicket";
 
 import DeleteDialog from "../ui/DeleteDialog";
 import PaginationComponent from "../ui/PaginationComponent";
-import { Box, FormControl, MenuItem, Select } from "@mui/material";
+import {
+  Box,
+  Button,
+  Chip,
+  FormControl,
+  MenuItem,
+  Select,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import SearchComponent from "../ui/SearchComponent";
+import FilterComponent from "../ui/FilterComponent";
 
 function TicketsView() {
   const dispatch = useDispatch();
@@ -17,19 +27,20 @@ function TicketsView() {
   const [page, setPage] = useState(1);
   const [paginationUI, setPaginationUI] = useState(null);
   const [ticketsPerPage, setTicketsPerPage] = useState(10);
+  const [isFilter, setIsFilter] = useState(false);
+  const [isReset, setIsReset] = useState(false);
 
   const [toBeDeleted, setToBeDeleted] = useState(null);
   const [confirmedDeleteId, setConfirmedDeleteId] = useState(null);
 
-  const { tickets, totalTicketCount, loading, searchText } = useSelector(
-    (state) => state.tickets
-  );
+  const { tickets, totalTicketCount, loading, searchText, filters } =
+    useSelector((state) => state.tickets);
 
   useEffect(() => {
     dispatch(setLoading(true));
     console.log("TicketsView use Effect ", searchText);
-    dispatch(fetchTickets(page, ticketsPerPage, searchText));
-  }, [dispatch, page, ticketsPerPage, searchText]);
+    dispatch(fetchTickets(page, ticketsPerPage, searchText, filters));
+  }, [dispatch, page, ticketsPerPage, searchText, filters]);
 
   useEffect(
     function () {
@@ -45,7 +56,7 @@ function TicketsView() {
     setConfirmedDeleteId(ticket.id);
     setToBeDeleted(ticket);
   }
-
+  console.log(confirmedDeleteId, page, ticketsPerPage);
   function handleConfirmDelete() {
     dispatch(deleteTicket(confirmedDeleteId, page, ticketsPerPage));
     setIsOpen(false);
@@ -60,16 +71,83 @@ function TicketsView() {
     setPage(1);
   }
 
+  function handleOnFilter() {
+    setIsFilter(true);
+  }
+
+  function handleOnFilterReset() {
+    dispatch(setFilters(null));
+    setIsReset((reset) => !reset);
+  }
+
+  function handleOnCloseIcon(key) {
+    const updatedFilters = { ...filters, [key]: "" };
+    dispatch(setFilters(updatedFilters));
+  }
+
   return (
     <>
       <div>
         <h2>Tickets</h2>
-        <SearchComponent
-          page={page}
-          setPage={setPage}
-          itemsPerPage={ticketsPerPage}
-          setTicketsPerPage={setTicketsPerPage}
-        />
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+            mt: 2,
+            mb: 2,
+          }}
+        >
+          <div style={{ display: "flex", gap: "8px" }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOnFilter}
+            >
+              Filter
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleOnFilterReset}
+            >
+              Reset
+            </Button>
+
+            <Box>
+              {filters &&
+                Object.entries(filters)
+                  .filter(([_, value]) => value)
+                  .map(([key, value]) => (
+                    <Chip
+                      key={key}
+                      label={
+                        <Box
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          {value}
+
+                          <IconButton>
+                            <CloseIcon onClick={() => handleOnCloseIcon(key)} />
+                          </IconButton>
+                        </Box>
+                      }
+                      // onDelete={() => handleDelete(key)}
+                      color="primary"
+                      variant="outlined"
+                    />
+                  ))}
+            </Box>
+          </div>
+
+          <SearchComponent
+            page={page}
+            setPage={setPage}
+            itemsPerPage={ticketsPerPage}
+            setTicketsPerPage={setTicketsPerPage}
+          />
+        </Box>
 
         {loading ? (
           <Spinner />
@@ -164,6 +242,11 @@ function TicketsView() {
         handleOnCancel={handleOnCancel}
         toBeDeleted={toBeDeleted}
         handleConfirmDelete={handleConfirmDelete}
+      />
+      <FilterComponent
+        isFilter={isFilter}
+        setIsFilter={setIsFilter}
+        isReset={isReset}
       />
     </>
   );

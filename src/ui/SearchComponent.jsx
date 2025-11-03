@@ -1,11 +1,13 @@
 import { Box, Button, TextField } from "@mui/material";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { fetchTickets } from "../services/api";
 import { setSearchText } from "../store/ticketsSlice";
 
 function SearchComponent({ page, itemsPerPage, setTicketsPerPage, setPage }) {
   const dispatch = useDispatch();
+  const filters = useSelector((state) => state.tickets.filters);
+
   const [searchValue, setSearchValue] = useState("");
 
   function handleReset() {
@@ -18,7 +20,7 @@ function SearchComponent({ page, itemsPerPage, setTicketsPerPage, setPage }) {
 
   function handleSearch() {
     console.log("Handle Search");
-    dispatch(fetchTickets(1, itemsPerPage, searchValue));
+    dispatch(fetchTickets(1, itemsPerPage, searchValue, filters));
     dispatch(setSearchText(searchValue));
   }
 
@@ -26,15 +28,15 @@ function SearchComponent({ page, itemsPerPage, setTicketsPerPage, setPage }) {
     <Box
       sx={{
         display: "flex",
-        gap: 0.5,
-        alignItems: "right",
-        justifyContent: "right",
-        mt: 3,
-        marginBottom: 1.5,
+        gap: 1,
+        alignItems: "center",
+        justifyContent: "flex-end",
+        mt: 0,
+        marginBottom: 0,
       }}
     >
       <TextField
-        label="Enter text"
+        label="Enter search text"
         variant="outlined"
         size="small"
         value={searchValue}
@@ -53,7 +55,12 @@ function SearchComponent({ page, itemsPerPage, setTicketsPerPage, setPage }) {
       >
         Search
       </Button>
-      <Button variant="contained" color="primary" onClick={handleReset}>
+      <Button
+        variant="contained"
+        color="primary"
+        disabled={!searchValue}
+        onClick={handleReset}
+      >
         Reset
       </Button>
     </Box>

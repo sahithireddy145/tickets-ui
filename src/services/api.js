@@ -20,7 +20,12 @@ const HEADERS = {
   Prefer: "count=exact",
 };
 
-export function fetchTickets(page = 1, itemsPerPage = 5, searchValue) {
+export function fetchTickets(
+  page = 1,
+  itemsPerPage = 5,
+  searchValue,
+  filterValue
+) {
   return async function (dispatch) {
     try {
       const start = (page - 1) * itemsPerPage;
@@ -29,6 +34,12 @@ export function fetchTickets(page = 1, itemsPerPage = 5, searchValue) {
       let url = `${API_URL}?select=*`;
 
       if (searchValue) url = `${API_URL}?title=ilike.*${searchValue}*`;
+
+      if (filterValue) {
+        Object.keys(filterValue).map((key) => {
+          if (filterValue[key]) url = url + `&${key}=eq.${filterValue[key]}`;
+        });
+      }
 
       const res = await fetch(url, {
         headers: { ...HEADERS, Range: `${start}-${end}` },
@@ -159,7 +170,14 @@ export function deleteTicket(id, page = 1, ticketsPerPage = 5, noFetch) {
       const state = getState();
       console.log("I am tickets Per Page", ticketsPerPage);
       if (!noFetch)
-        dispatch(fetchTickets(page, ticketsPerPage, state.tickets.searchText));
+        dispatch(
+          fetchTickets(
+            page,
+            ticketsPerPage,
+            state.tickets.searchText,
+            state.tickets.filters
+          )
+        );
     } catch (err) {
       console.error(err.message);
     }
