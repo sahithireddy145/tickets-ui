@@ -15,6 +15,7 @@ import {
   FormControl,
   InputLabel,
   Stack,
+  Tooltip,
 } from "@mui/material";
 
 import { format } from "date-fns";
@@ -297,7 +298,10 @@ function TicketDetails() {
         ) : (
           <Box sx={{ mb: 2 }}>
             <Typography>
-              <strong>ID:</strong> {currentTicket.id}
+              <strong>ID:</strong>
+              <Tooltip title={currentTicket.id}>
+                <span>{currentTicket.id.slice(-6)}</span>
+              </Tooltip>
             </Typography>
             <Typography>
               <strong>Title:</strong> {currentTicket.title}
@@ -311,7 +315,9 @@ function TicketDetails() {
             </Typography>
             <Typography>
               <strong>Assignee:</strong>{" "}
-              {getAssigneeLabel(currentTicket.assignee)}
+              <Tooltip title={currentTicket.assignee}>
+                <span> {getAssigneeLabel(currentTicket.assignee)}</span>
+              </Tooltip>
             </Typography>
             <Typography>
               <strong>Reporter:</strong> {currentTicket.reporter}
